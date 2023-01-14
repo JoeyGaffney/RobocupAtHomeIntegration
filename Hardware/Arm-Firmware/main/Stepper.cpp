@@ -12,9 +12,9 @@ Stepper::Stepper(int _enable, int _pulse, int _dir, int _steps) {
     dir = _dir;
     stepsperrev = _steps;
     currentStep = 0;
-    // // pinMode(enable, OUTPUT);
-    // // pinMode(pulse, OUTPUT);
-    // // pinMode(dir, OUTPUT);
+    pinMode(enable, OUTPUT);
+    pinMode(pulse, OUTPUT);
+    pinMode(dir, OUTPUT);
 
     
 }
@@ -94,5 +94,5 @@ void Stepper::test() {
     delay(1000);
     MCP23017::mcp_instances[0] -> mcpWrite(pulse, LOW);
     delay(1000);
-    //stepCW(600);
+    stepCW(600);
 }
