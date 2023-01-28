@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include "MCP23017.h"
 #ifndef STEPPER_H
 #define STEPPER_H
 
@@ -12,7 +11,6 @@ class Stepper {
         void moveToAngle(int);
         int getCurrentStep();
         void test();
-        void connectMCP();
         void stepCW(unsigned long int);
         void stepCCW(unsigned long int);
     private:
@@ -21,7 +19,6 @@ class Stepper {
         int dir;
         int stepsperrev;
         unsigned long stepdelay;
-        //static MCP23017 *mcpArray;
         int currentStep;
         // void stepCW(int);
         // void stepCCW(int);

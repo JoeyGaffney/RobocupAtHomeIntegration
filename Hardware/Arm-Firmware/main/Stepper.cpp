@@ -1,10 +1,5 @@
 #include "Stepper.h"
 
-// Potentially useful example of Non-Blocking Stepper motor driver
-// https://github.com/reven/Unistep2/blob/master/src/Unistep2.cpp
-// I'd reccommend starting by implementing the stepper motor functionality
-// as blocking functions since this is easier
-
 Stepper::Stepper(int _enable, int _pulse, int _dir, int _steps) {
     Serial.println("made it to stepper constructor");
     enable = _enable;
@@ -19,34 +14,26 @@ Stepper::Stepper(int _enable, int _pulse, int _dir, int _steps) {
     
 }
 
-void Stepper::connectMCP() {
-    MCP23017::mcp_instances[0] -> mcpPinMode(enable, OUTPUT);
-    MCP23017::mcp_instances[0] -> mcpPinMode(pulse, OUTPUT);
-    MCP23017::mcp_instances[0] -> mcpPinMode(dir, OUTPUT);
-}
-
 void Stepper::enableMotor() {
-    //digitalWrite(enable, HIGH);
-    MCP23017::mcp_instances[0] -> mcpWrite(enable, HIGH);
-    //Serial.println("Enabled motor.");
+    digitalWrite(enable, HIGH);
+    Serial.println("Enabled motor.");
 }
 
 void Stepper::disableMotor() {
-    //digitalWrite(enable, LOW);
-    MCP23017::mcp_instances[0] -> mcpWrite(enable, LOW);
+    digitalWrite(enable, LOW);
 }
 
 // Speed should be angular speed in degrees/s
 // stepdelay = time in microseconds seconds taken to travel two steps?
 void Stepper::setSpeed(int speed) {
     stepdelay = 2;
-    //stepdelay =  (360 * 1000000 / (2 * (unsigned long) speed * (unsigned long) stepsperrev));
-    // Serial.print("step delay: ");
-    // Serial.println(stepdelay);
-    // Serial.print("steps: ");
-    // Serial.println(stepsperrev);
-    // Serial.print("speed: ");
-    // Serial.println(speed);
+    stepdelay =  (360 * 1000000 / (2 * (unsigned long) speed * (unsigned long) stepsperrev));
+    Serial.print("step delay: ");
+    Serial.println(stepdelay);
+    Serial.print("steps: ");
+    Serial.println(stepsperrev);
+    Serial.print("speed: ");
+    Serial.println(speed);
 
 }
 
@@ -69,30 +56,30 @@ void Stepper::step(unsigned long int steps) {
             lastStepTime = time;
             pulses--;
             if(pulses % 2 == 0) {
-                MCP23017::mcp_instances[0] -> mcpWrite(pulse, HIGH);
+              digitalWrite(pulse, HIGH);
             } else {
-                MCP23017::mcp_instances[0] -> mcpWrite(pulse, LOW);
+              digitalWrite(pulse, LOW);
             }
         }
     }
-    //Serial.print("Finished stepping.");
+    Serial.print("Finished stepping.");
 }
 
 void Stepper::stepCW(unsigned long int steps) {
-    MCP23017::mcp_instances[0] -> mcpWrite(dir, HIGH);
+    digitalWrite(dir, HIGH);
     step(steps);
 }
 
 void Stepper::stepCCW(unsigned long int steps) {
-    MCP23017::mcp_instances[0] -> mcpWrite(dir, LOW);
+    digitalWrite(dir, LOW);
     step(steps);
 }
 
 void Stepper::test() {
-    MCP23017::mcp_instances[0] -> mcpWrite(pulse, HIGH);
+    digitalWrite(pulse, HIGH);
     Serial.println("in test.");
     delay(1000);
-    MCP23017::mcp_instances[0] -> mcpWrite(pulse, LOW);
+    digitalWrite(pulse, LOW);
     delay(1000);
     stepCW(600);
 }
