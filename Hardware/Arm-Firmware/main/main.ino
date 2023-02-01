@@ -1,20 +1,7 @@
 #include <Arduino.h>
 #include "MCP23017.h"
 #include "Stepper.h"
-//#include <Adafruit_MCP23017.h>
-//#define PULpin 10
-//#define DIRpin 11
-//#define ENApin 9
-//int STEPSPERREV = 4000;
-//long unsigned int stepthismuch = STEPSPERREV*50;
-//unsigned long stepdelay = 0;
-//MCP23017 mcp_pin2; // the chip corresponding to this class interrupts on arduino pin 2
-//MCP23017 mcp_pin3; // the chip corresponding to this class interrupts on arduino pin 3
-//MCP23017* MCP23017::mcp_instances [2] = { NULL, NULL };
-//Stepper myStepper(ENApin, PULpin, DIRpin, STEPSPERREV);
-//int steps = 0;
 
-/* relic of manual setup
 // bicep 
 #define pulse_1 3
 #define dir_1 4
@@ -24,7 +11,7 @@
 // shoulder 
 #define pulse_3 7
 #define dir_3 8
-*/
+
 // enable all steppers
 #define enable 13
 // steps per rev:
@@ -57,7 +44,9 @@ void loop() {
     /*
       TODO: 
         * set up encoders --> they will be posn_actual's
-        * serial input --> should change this to ask for joint positions as inputs then convert those to steps
+        * serial input --> input a nx6 array of joint angles (degrees) 
+        * write a quick python script for parsing start and end into nx6 arrays 
+            where the change in angle is never greater than X
     */
 
     // serial in for the 3 motor positions
