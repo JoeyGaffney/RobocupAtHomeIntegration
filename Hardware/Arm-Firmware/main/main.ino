@@ -44,8 +44,11 @@ void loop() {
     */
 
 /*
-load in the csv and parse the arrays
+Read Serial
 */
+
+while (!Serial.available());
+x = Serial.read
 
 int position_d[6] = [];
 int position_measured[6] = [];
