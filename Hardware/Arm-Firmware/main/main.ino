@@ -1,5 +1,24 @@
 #include <Arduino.h>
 #include "Stepper.h"
+#include <ros.h>
+#include <std_msgs/Float64.h>
+#include <ob1_arm_hw_interface/armCmd.h>
+#include <ob1_arm_hw_interface/armState.h>
+
+ros::NodeHandle nh;
+
+uint32_t rcv_cnt;
+int num_joints;
+
+void armCmdCb( const ob1_arm_hw_interface::armCmd &msg){
+  rcv_cnt++;
+  num_joints = msg.num_joints;
+  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
+}
+
+ob1_arm_hw_interface::armState armState;
+ros::Subscriber<ob1_arm_hw_interface::armCmd> s("/arduino/armCmd", &armCmdCb);
+ros::Publisher p("/arduino/armState", &armState);
 
 // bicep 
 #define pulse_1 3
@@ -30,6 +49,12 @@ void setup() {
   Serial.begin(115200); // read
   Serial.println("initialized");
   // stepper constructor should take care of all the pin initializations
+  rcv_cnt = 0;
+  num_joints = 0;
+  pinMode(13, OUTPUT);
+  nh.initNode();
+  nh.advertise(p);
+  nh.subscribe(s);
 
 }
 
@@ -43,21 +68,19 @@ void loop() {
         *   one at a time (they are all one degree at a time)
     */
 
-byte trans_array[6];
-int position_goal[6];
-int position_measured[6];
-double f; // tempvar for the byte -> float conversion
-
-// populate goal
-if(Serial.available() >= 6){
-  for(int i = 0; i < 7; i++){
-    // float x = static_cast<float>(Serial.read()); // read digit from serial, and covert it to a double
-    trans_array[i] = (Serial.read());//x;
-    memcpy( &f, trans_array, 8 );
-    position_goal[i] = f;
+armState.msg_rcv_ctr = rcv_cnt;
+  
+  for(int i = 0; i < num_joints; i++){
+    armState.angle[i] = 0.3;
+    armState.vel[i] = 0;
   }
-
-}
+  
+  p.publish( &armState );
+  nh.spinOnce();
+  delay(10);
+  for(int i = 0; i < num_joints; i++){
+    position_goal[i] =  armState.angle[i]
+  }
 
 /*
 Write serial to send current joint positions
@@ -103,5 +126,4 @@ Write serial to send current joint positions
     }
 
 // send new joint positions
-Serial.write(analogRead(A0));
 }
