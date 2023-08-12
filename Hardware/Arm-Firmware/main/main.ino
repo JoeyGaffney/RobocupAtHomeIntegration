@@ -10,11 +10,25 @@ ros::NodeHandle nh;
 uint32_t rcv_cnt;
 int num_joints;
 
+ob1_arm_hw_interface::armState armState;
+ros::Publisher p("/arduino/armState", &armState);
+
+//callback function called when new arm cmd received
 void armCmdCb( const ob1_arm_hw_interface::armCmd &msg){
   rcv_cnt++;
   num_joints = msg.num_joints;
-  digitalWrite(13, HIGH-digitalRead(13));   // blink the led
+  digitalWrite(13, HIGH-digitalRead(13));   // blink the led on rcv
+  
+  armState.msg_rcv_ctr = rcv_cnt;
+  for(int i = 0; i < num_joints; i++)
+  {
+    armState.angle[i] = msg.angle[0];
+    armState.vel[i] = msg.vel[0];
+  }
+  
 }
+
+ros::Subscriber<ob1_arm_hw_interface::armCmd> s("/arduino/armCmd", &armCmdCb);
 
 ob1_arm_hw_interface::armState armState;
 ros::Subscriber<ob1_arm_hw_interface::armCmd> s("/arduino/armCmd", &armCmdCb);
@@ -51,7 +65,6 @@ void setup() {
   // stepper constructor should take care of all the pin initializations
   rcv_cnt = 0;
   num_joints = 0;
-  pinMode(13, OUTPUT);
   nh.initNode();
   nh.advertise(p);
   nh.subscribe(s);
@@ -68,7 +81,10 @@ void loop() {
         *   one at a time (they are all one degree at a time)
     */
 
-armState.msg_rcv_ctr = rcv_cnt;
+
+  p.publish( &armState );
+  nh.spinOnce();
+  delay(10);
   
   for(int i = 0; i < num_joints; i++){
     armState.angle[i] = 0.3;
